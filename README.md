@@ -8,7 +8,7 @@ A minimal, fast, fully functional Quickshell setup for **niri**.
 
 ![widgets](screenshots/scrt3.jpg)
 
-Forked from [voidarc/quickshell](https://git.voidarc.co.uk/voidarc/quickshell/), which targets Hyprland only. This fork adapts the bar and the rest of the config to work with niri.
+Forked from [A Dumb Human](https://git.voidarc.co.uk/voidarc/quickshell/)(yes that's his known name), which targets Hyprland only. This fork adapts the bar and the rest of the config to work with niri.
 
 > Using Hyprland? Use the original repo instead. This one is niri-only.
 

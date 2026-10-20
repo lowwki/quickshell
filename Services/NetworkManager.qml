@@ -2,49 +2,60 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Quickshell.Networking
+
 
 Singleton {
   id: root
 
-  property bool connectedWifi: root.defaultAdapter != null && root.defaultAdapter.connected
-							   && root.defaultAdapter.type == DeviceType.Wifi
-  // True when any Wi-Fi or wired device is connected; the bar icon is shown only then
-  property bool online: {
-	for (let device of Networking.devices.values) {
-	  if (device.connected && (device.type == DeviceType.Wifi || device.type == DeviceType.Wired))
-		return true;
-	}
-	return false;
-  }
-
-  // Prefer a connected Wi-Fi device, then a connected wired one, then any Wi-Fi, then the first device
-  property NetworkDevice defaultAdapter: {
-	const devices = Networking.devices.values;
-	let wifi = null;
-	let wired = null;
-	for (let device of devices) {
-	  if (device.type == DeviceType.Wifi) {
-		if (device.connected)
-		  return device;
-		wifi = wifi || device;
-	  } else if (device.type == DeviceType.Wired && device.connected) {
-		wired = wired || device;
-	  }
-	}
-	return wired || wifi || devices[0] || null;
-  }
+  property var devices: []
+  property var defaultAdapter: null
   property string ipAddress: "0.0.0.0"
 
-  function getConnectedNetworks(networksArr) {
-	let connectedNetworks = [];
+  property bool connectedWifi: defaultAdapter != null && defaultAdapter.connected && defaultAdapter.isWifi
+  property bool online: devices.some(d => d.connected)
 
-	for (let network of networksArr) {
-	  if (network.state == ConnectionState.Connected) {
-		connectedNetworks.push(network);
+  function pickDefault(list) {
+	let wifi = null;
+	let wired = null;
+	for (let d of list) {
+	  if (d.isWifi) {
+		if (d.connected)
+		  return d;
+		wifi = wifi || d;
+	  } else if (d.connected) {
+		wired = wired || d;
 	  }
 	}
-	return connectedNetworks;
+	return wired || wifi || list[0] || null;
+  }
+
+  function parseDevices(text) {
+	let list = [];
+	for (let line of text.split("\n")) {
+	  if (line.trim() === "")
+		continue;
+	  const p = line.split("|");
+	  if (p.length < 6)
+		continue;
+	  const isWifi = p[1] === "wifi";
+	  const dbm = parseInt(p[5]);
+	  let strength = 0;
+	  if (!isNaN(dbm))
+		strength = Math.max(0, Math.min(1, (dbm + 90) / 60));
+	  list.push({
+		"name": p[0],
+		"isWifi": isWifi,
+		"connected": p[2] === "up" && (isWifi ? p[4] !== "" : true),
+		"ip": p[3],
+		"ssid": p[4],
+		"strength": strength
+	  });
+	}
+	return list;
+  }
+
+  function getConnectedNetworks(networksArr) {
+	return networksArr.filter(n => n.connected);
   }
 
   function getNetworkDetails(adapter) {
@@ -59,8 +70,7 @@ Singleton {
 	  };
 	}
 
-	// Wired devices have no Wi-Fi network list
-	if (!isDeviceWifi(adapter)) {
+	if (!adapter.isWifi) {
 	  return {
 		"adapterName": adapter.name,
 		"adapterConnected": adapter.connected,
@@ -73,54 +83,38 @@ Singleton {
 	  };
 	}
 
-	let networksArr = adapter.networks.values;
-	let connectedNetworks = getConnectedNetworks(networksArr);
-	let deviceWifi = isDeviceWifi(adapter);
-
-	let primaryNetwork = connectedNetworks[0];
-	if (!primaryNetwork) {
+	if (!adapter.connected) {
 	  return {
 		"adapterName": adapter.name,
-		"adapterConnected": adapter.connected,
-		"adapterIsWifi": deviceWifi,
+		"adapterConnected": false,
+		"adapterIsWifi": true,
 		"networkName": "No Network",
 		"networkStrength": 0,
 		"icon": "󰤭"
 	  };
 	}
 
-	let networkName = primaryNetwork.name;
-	let networkStrength = primaryNetwork.signalStrength;
-
-	let networkIcon = getWifiIcon(networkStrength);
-
-	let outputDict = {
+	return {
 	  "adapterName": adapter.name,
-	  "adapterConnected": adapter.connected,
-	  "adapterIsWifi": deviceWifi,
-	  "networkName": networkName,
-	  "networkStrength": networkStrength,
-	  "icon": networkIcon,
-	  "saved": primaryNetwork.known,
+	  "adapterConnected": true,
+	  "adapterIsWifi": true,
+	  "networkName": adapter.ssid,
+	  "networkStrength": adapter.strength,
+	  "icon": getWifiIcon(adapter.strength),
+	  "saved": true,
 	  "ipAddress": root.ipAddress
 	};
-	return outputDict;
   }
 
   function getWifiIcon(strength) {
 	let iconArr = ["󰤟", "󰤢", "󰤥", "󰤨"];
-	let strengthIndex = Math.ceil(strength * iconArr.length);
+	let strengthIndex = Math.max(1, Math.ceil(strength * iconArr.length));
 	return iconArr[strengthIndex - 1];
   }
 
   function getWifiText() {
 	let info = getNetworkDetails(defaultAdapter);
-
-	let adapter = info["adapterName"];
-	let name = info["networkName"];
-
-	let finalString = adapter + " - " + name;
-	return finalString;
+	return info["adapterName"] + " - " + info["networkName"];
   }
 
   function isConnectedAndWifi() {
@@ -128,32 +122,58 @@ Singleton {
   }
 
   function isDeviceWifi(adapter) {
-	if (adapter.type == DeviceType.Wifi) {
-	  return true;
-	} else if (adapter.type == DeviceType.Wired) {
-	  return false;
-	} else {
-	  return false;
-	}
+	return adapter != null && adapter.isWifi === true;
   }
 
   function refreshIpAddress() {
-	ipProcess.running = true;
+	refresh();
   }
 
-  onDefaultAdapterChanged: refreshIpAddress()
-  onConnectedWifiChanged: refreshIpAddress()
-  onOnlineChanged: refreshIpAddress()
+  function refresh() {
+	if (!poll.running)
+	  poll.running = true;
+  }
+
+  Timer {
+	interval: 3000
+	running: true
+	repeat: true
+	triggeredOnStart: true
+	onTriggered: root.refresh()
+  }
+
 
   Process {
-	id: ipProcess
+	id: poll
 
-	command: root.defaultAdapter ? ["sh", "-c", "ip -4 -o addr show dev " + root.defaultAdapter.name
-	  + " scope global | awk '{sub(\"/.*\", \"\", $4); printf $4}'"] : ["true"]
+	command: ["sh", "-c", `
+	  for d in /sys/class/net/*; do
+		n=$(basename "$d")
+		[ "$n" = lo ] && continue
+		if [ -e "$d/wireless" ]; then t=wifi
+		elif [ -e "$d/device" ]; then t=wired
+		else continue; fi
+		s=$(cat "$d/operstate" 2>/dev/null)
+		ip4=$(ip -4 -o addr show dev "$n" scope global 2>/dev/null | awk '{sub("/.*", "", $4); print $4; exit}')
+		ssid=""; sig=""
+		if [ "$t" = wifi ] && [ "$s" = up ]; then
+		  l=$(iw dev "$n" link 2>/dev/null)
+		  ssid=$(printf '%s\n' "$l" | awk -F'SSID: ' '/SSID:/{print $2; exit}')
+		  sig=$(printf '%s\n' "$l" | awk '/signal:/{print $2; exit}')
+		fi
+		echo "$n|$t|$s|$ip4|$ssid|$sig"
+	  done
+	`]
 	running: false
 
 	stdout: StdioCollector {
-	  onStreamFinished: root.ipAddress = this.text
+	  onStreamFinished: {
+		const list = root.parseDevices(this.text);
+		root.devices = list;
+		root.defaultAdapter = root.pickDefault(list);
+		root.ipAddress = (root.defaultAdapter && root.defaultAdapter.connected && root.defaultAdapter.ip !== "")
+		  ? root.defaultAdapter.ip : "0.0.0.0";
+	  }
 	}
   }
 }

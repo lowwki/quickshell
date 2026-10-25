@@ -44,6 +44,8 @@ Item {
   property bool hovered: false
   property Component openedItem
   property bool overriden: false
+  property int popDuration: 185                                           // shared by width, height and radius
+  property real popOvershoot: 0.8
   property alias rect: container
   property alias stack: containerContent
   property alias tap: tapHandler
@@ -56,26 +58,23 @@ Item {
   Behavior on anchors.topMargin {
 	animation: defaultCurve
  }
-  Behavior on boxRadius {                                                    // animations, while opens their popups.
-	 NumberAnimation {
-	   duration: 170
-	   easing.type: Easing.OutBack
-     easing.overshoot: 0.8
-	 }
-	  }
-	  Behavior on implicitHeight {
-	 NumberAnimation {
-	    duration: 185
-	   easing.type: Easing.OutBack
-   easing.overshoot: 0.8
-	 }
-	  }
-	  Behavior on implicitWidth {
-	 NumberAnimation {
-	   duration: 185
-	   easing.type: Easing.OutBack
-	   easing.overshoot: 0.8
-	 }
+  // Width, height and corner radius use the same duration and easing, so the box grows
+  // as one shape. The radius is animated only once, by container.radius below; it used to
+  // be animated here as well, which made the corners trail behind the size.
+  Behavior on implicitHeight {
+    NumberAnimation {
+      duration: root.popDuration
+      easing.overshoot: root.popOvershoot
+      easing.type: Easing.OutBack
+    }
+  }
+
+  Behavior on implicitWidth {
+    NumberAnimation {
+      duration: root.popDuration
+      easing.overshoot: root.popOvershoot
+      easing.type: Easing.OutBack
+    }
   }
   states: [
 	State {
@@ -253,9 +252,9 @@ Item {
 
 	Behavior on radius {
 	  NumberAnimation {
-		duration: 170
+		duration: root.popDuration
 		easing.type: Easing.OutBack
-		easing.overshoot: 0.8
+		easing.overshoot: root.popOvershoot
 	  }
 	}
 

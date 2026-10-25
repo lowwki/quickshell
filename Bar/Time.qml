@@ -554,6 +554,8 @@ Container {
       readonly property real position: player ? Math.max(0, player.position) : 0
       readonly property real progress: length > 0 ? Math.min(1, position / length) : 0
       readonly property bool seekable: hasLength && player.positionSupported && player.canSeek
+      // false while the box is still growing; see the seek handle's Behavior below
+      property bool settled: false
       readonly property real shownProgress: dragging ? dragProgress : progress
 
       function formatTime(seconds) {
@@ -590,6 +592,15 @@ Container {
           mprisToastRoot.player.positionChanged();
           mprisToastRoot.dragging = false;
         }
+      }
+
+      // Marks the toast as settled once the box has finished growing
+      Timer {
+        interval: root.popDuration + 60
+        repeat: false
+        running: true
+
+        onTriggered: mprisToastRoot.settled = true
       }
 
       // TEMPORARY: set debug to false once the timeline behaves
@@ -728,8 +739,11 @@ Container {
                 width: 3
                 x: Math.min(seekBar.width - width, Math.max(0, (seekBar.width * mprisToastRoot.shownProgress) - (width / 2)))
 
+                // Glide only once the box has settled. While it grows, the slider width changes
+                // every frame, and a 450ms glide made the handle (and the filled track) keep
+                // moving for a while after the box had already stopped.
                 Behavior on x {
-                  enabled: !mprisToastRoot.dragging
+                  enabled: !mprisToastRoot.dragging && mprisToastRoot.settled
 
                   NumberAnimation {
                     duration: 450

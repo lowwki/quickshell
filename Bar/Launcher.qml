@@ -60,7 +60,7 @@ Scope {
     //  system actions 
     // keep: true , run the action but dont close the launcher
     readonly property var actions: [
-        { name: "logout",          keys: "exit niri",         cmd: ["niri", "msg", "action", "quit", "--skip-confirmation"] },
+        { name: "logout",          keys: "exit niri",         cmd: ["niri", "msg", "action", "quit" ] },
         { name: "hibernate",       keys: "",                  cmd: ["systemctl", "hibernate"] },
         { name: "suspend",         keys: "sleep",             cmd: ["systemctl", "suspend"] },
         { name: "shutdown",        keys: "poweroff power off", cmd: ["poweroff"] },
@@ -72,6 +72,12 @@ Scope {
         { name: "brightness down", keys: "backlight screen",  keep: true, cmd: ["brightnessctl", "set", "5%-"] },
         { name: "bluetooth on",    keys: "",                  keep: true, cmd: ["bluetoothctl", "power", "on"] },
         { name: "bluetooth off",   keys: "",                  keep: true, cmd: ["bluetoothctl", "power", "off"] }
+        { name: "night mode up",   keys: "nightlight blue light filter warmer more", keep: true, cmd: ["nightmode", "up"] },
+        { name: "night mode down", keys: "nightlight blue light filter cooler less", keep: true, cmd: ["nightmode", "down"] },
+        { name: "night mode",      keys: "nightlight blue light filter toggle",      keep: true, cmd: ["nightmode", "toggle"] },
+        { name: "night mode off",  keys: "nightlight blue light filter",             keep: true, cmd: ["nightmode", "off"] },
+        { name: "wifi",      keys: "wifitui internet",              keep: false, cmd: ["kitty", "-e", "wifitui"] },
+        { name: "bluetooth", keys: "bt bluetui pairing devices",    keep: false, cmd: ["kitty", "-e", "bluetui"] },
     ]
 
     // emoji
@@ -117,8 +123,6 @@ Scope {
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
             WlrLayershell.namespace: "launcher"
 
-            // typing bar stays fixed a little above vertical centre;
-            // only the results below it grow / shrink.
             anchors.top: true
             margins.top: Math.round((screen ? screen.height : 1080) * 0.30)
 

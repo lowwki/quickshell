@@ -1,166 +1,126 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
-import QtQuick.Layouts
 import Quickshell
-import Quickshell.Wayland
 import "./Bar"
 import "./Services/"
 import "Color.js" as Colors
 
 Scope {
   Variants {
-	id: panelDelegate
-
-	delegate: panelWindow
-	model: Quickshell.screens
+    delegate: panelWindow
+    model: Quickshell.screens
   }
 
   Component {
-	id: panelWindow
+    id: panelWindow
 
-	PanelWindow {
-	  id: win
+    PanelWindow {
+      id: win
 
-	  property double barExclusionZone: IpcManager.tabletMode ? 35 : 7
-	  property double barMaxHeight: modelData.height
-	  required property var modelData
-	  // niri: the screen itself stands in for the monitor object
-	  property var monitor: modelData
-	  property bool monitorFocused: NiriService.focusedOutput === modelData.name
+      required property var modelData
 
-	  WlrLayershell.keyboardFocus: monitorFocused ? IpcManager.focusState :
-															 WlrKeyboardFocus.None
-	  color: "transparent"
-	  exclusionMode: ExclusionMode.Normal
-	  exclusiveZone: barExclusionZone
-	  implicitHeight: barMaxHeight
-	  mask: maskRegion
-	  screen: modelData
+      color: "transparent"
+      exclusionMode: ExclusionMode.Normal
+      exclusiveZone: IpcManager.tabletMode ? 35 : 7
+      // Tall enough for the largest popup (notification, media toast, device lists).
+      // Input outside the mask regions below passes straight through to windows underneath.
+      implicitHeight: 400
+      mask: maskRegion
+      screen: modelData
 
-	  Rectangle {
-		id: blurOverlay
+      anchors {
+        left: true
+        right: true
+        top: true
+      }
 
-		color: Colors.base
-		implicitHeight: win.modelData.height
-		implicitWidth: win.modelData.width
-		opacity: IpcManager.logoutMenuOpen == true ? 0.8 : 0
-
-		Behavior on opacity {
-		  NumberAnimation {
-			duration: 200
-		  }
-		}
-	  }
-
-    
-    Region {
+      Region {
         id: maskRegion
 
         Region {
-            item: launcher
+          item: left
+        }
+
+        Region {
+          item: center
+        }
+
+        Region {
+          item: right
+        }
+      }
+
+      MultiEffect {
+        anchors.fill: rowContainer
+        shadowBlur: 1
+        shadowColor: Colors.mantle
+        shadowEnabled: true
+        shadowHorizontalOffset: 3
+        shadowOpacity: 1
+        shadowVerticalOffset: 1
+        source: rowContainer
+      }
+
+      Item {
+        id: rowContainer
+
+        anchors {
+          fill: parent
+          leftMargin: 3
+          rightMargin: 3
+          topMargin: 3
+        }
+
+        Row {
+          id: left
+
+          anchors {
+            left: parent.left
+            top: parent.top
+          }
+
+          WorkspaceSelector {
+            monitor: win.modelData
+          }
+        }
+
+        Row {
+          id: center
+
+          anchors {
+            horizontalCenter: parent.horizontalCenter
+            top: parent.top
+          }
+
+          Time {
+            monitor: win.modelData
+          }
+        }
+
+        Row {
+          id: right
+
+          spacing: 5
+
+          anchors {
+            right: parent.right
+            top: parent.top
+          }
+
+          Network {
+            monitor: win.modelData
+          }
+
+          Bluetooth {
+            monitor: win.modelData
+          }
+
+          Battery {
+            monitor: win.modelData
+          }
+        }
+      }
     }
-
-    Region {
-		  item: left
-    }
-    
-    Region {
-		  item: center
-		}
-  
-    Region {
-		  item: right
-		}
-	  }
-
-	  anchors {
-		left: true
-		right: true
-		top: true
-	  }
-
-	  MultiEffect {
-		 anchors.fill: rowContainer
-		 shadowBlur: 1
-		 shadowColor: Colors.mantle
-		 shadowEnabled: true
-		 shadowHorizontalOffset: 3
-		 shadowOpacity: 1
-		 shadowVerticalOffset: 1
-		 source: rowContainer
-		}
-
-	  Item {
-		id: rowContainer
-
-		anchors {
-		  fill: parent
-		  topMargin: 3
-		}
-
-		anchors {
-		  left: parent.left
-		  leftMargin: 3
-		  right: parent.right
-		  rightMargin: 3
-		  top: parent.top
-		}
-
-		Launcher {
-		   id: launcher
-		 }
-
-		Row {
-		  id: left
-
-		  anchors {
-			left: parent.left
-			top: parent.top
-		  }
-
-		  WorkspaceSelector {
-			monitor: win.monitor
-		  }
-		}
-
-		Row {
-		  id: center
-
-		  anchors {
-			horizontalCenter: parent.horizontalCenter
-			top: parent.top
-		  }
-
-		  Time {
-			monitor: win.monitor
-		  }
-		}
-
-		Row {
-		  id: right
-
-		  Layout.alignment: Qt.AlignTop
-		  spacing: 5
-
-		  anchors {
-			right: parent.right
-			top: parent.top
-		  }
-
-		  Network {
-			monitor: win.monitor
-		  }
-
-		  Bluetooth {
-			monitor: win.monitor
-		  }
-
-		  Battery {
-			monitor: win.monitor
-		  }
-		}
-	  }
-	}
   }
 }

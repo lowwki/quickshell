@@ -80,26 +80,32 @@ Container {
     }
   }
 
+  // Opens the toast unless a notification is showing or nothing is playing
+  function openMpris() {
+    if (root.notified || !MprisManager.getPlaying())
+      return;
+
+    root.overriden = true;
+    root.mpris = true;
+  }
+
   // Toast shows only while hovering AND something is playing
   onHoveredChanged: {
-    if (root.hovered == true) {
-      if (root.notified == false && MprisManager.getPlaying() == true) {
-        root.overriden = true;
-        root.mpris = true;
-      }
-    } else {
+    if (!root.hovered) {
       root.closeMpris();
+      return;
     }
+    root.openMpris();
   }
 
   // Pause/stop/player gone closes it; playback starting under the cursor opens it
   onMprisPlayingChanged: {
-    if (root.mprisPlaying == false) {
+    if (!root.mprisPlaying) {
       root.closeMpris();
-    } else if (root.hovered == true && root.notified == false) {
-      root.overriden = true;
-      root.mpris = true;
+      return;
     }
+    if (root.hovered)
+      root.openMpris();
   }
 
   Connections {

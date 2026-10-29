@@ -150,11 +150,61 @@ Scope {
                 return { mode: "apps", q: raw.trim() }
             }
 
+            function appResults(p, q) {
+                const out = []
+                const sp = p.q.indexOf(" ")
+                if (sp > 0) {
+                    const w = root.web[p.q.slice(0, sp)]
+                    const term = p.q.slice(sp + 1).trim()
+                    if (w && term)
+                        out.push({ s: 99, i: 0, name: w.label + ": " + term, sub: "",
+                                   run: () => root.webSearch(w, term) })
+                }
+                const apps = DesktopEntries.applications.values
+                for (let i = 0; i < apps.length; i++) {
+                    const a = apps[i]
+                    const s = Math.max(score(a.name, q), score(a.genericName, q) > 0 ? 1 : 0)
+                    if (s > 0) out.push({ s: s, i: i, name: a.name, sub: a.comment || "",
+                                          run: () => a.execute() })
+                }
+                if (q === "") return out
+                for (let i = 0; i < root.actions.length; i++) {
+                    const act = root.actions[i]
+                    const s = Math.max(score(act.name, q), score(act.keys, q) > 0 ? 1 : 0)
+                    if (s > 0) out.push({ s: s + 0.5, i: i, name: act.name, sub: "",
+                                          keep: act.keep === true,
+                                          run: () => Quickshell.execDetached(act.cmd) })
+                }
+                return out
+            }
+
+            function emojiResults(q) {
+                if (root.emojis.length === 0) root.loadEmoji()
+                const out = []
+                for (let i = 0; i < root.emojis.length; i++) {
+                    const e = root.emojis[i]
+                    const s = q === "" ? 1 : score(e.name, q)
+                    if (s > 0) out.push({ s: s, i: i, name: e.ch + "  " + e.name, sub: "",
+                                          run: () => root.typeText(e.ch) })
+                }
+                return out
+            }
+
+            function clipResults(q) {
+                if (lastMode !== "clip") { clipItems = []; clip.running = true }
+                const out = []
+                for (let i = 0; i < clipItems.length; i++) {
+                    const c = clipItems[i]
+                    const s = q === "" ? 1 : score(c.text, q)
+                    if (s > 0) out.push({ s: s, i: i, name: c.text.replace(/\s+/g, " "), sub: "",
+                                          run: () => root.pasteClip(c.id) })
+                }
+                return out
+            }
+
             function update() {
                 const p = parse(input.text)
-                const q = p.q.toLowerCase()
                 mode = p.mode
-                let out = []
 
                 if (p.mode === "files") {
                     if (lastMode !== "files") results = []
@@ -163,48 +213,10 @@ Scope {
                     return
                 }
 
-                if (p.mode === "apps") {
-                    const sp = p.q.indexOf(" ")
-                    if (sp > 0) {
-                        const w = root.web[p.q.slice(0, sp)]
-                        const term = p.q.slice(sp + 1).trim()
-                        if (w && term)
-                            out.push({ s: 99, i: 0, name: w.label + ": " + term, sub: "",
-                                       run: () => root.webSearch(w, term) })
-                    }
-                    const apps = DesktopEntries.applications.values
-                    for (let i = 0; i < apps.length; i++) {
-                        const a = apps[i]
-                        const s = Math.max(score(a.name, q), score(a.genericName, q) > 0 ? 1 : 0)
-                        if (s > 0) out.push({ s: s, i: i, name: a.name, sub: a.comment || "",
-                                              run: () => a.execute() })
-                    }
-                    if (q !== "") {
-                        for (let i = 0; i < root.actions.length; i++) {
-                            const act = root.actions[i]
-                            const s = Math.max(score(act.name, q), score(act.keys, q) > 0 ? 1 : 0)
-                            if (s > 0) out.push({ s: s + 0.5, i: i, name: act.name, sub: "",
-                                                  keep: act.keep === true,
-                                                  run: () => Quickshell.execDetached(act.cmd) })
-                        }
-                    }
-                } else if (p.mode === "emoji") {
-                    if (root.emojis.length === 0) root.loadEmoji()
-                    for (let i = 0; i < root.emojis.length; i++) {
-                        const e = root.emojis[i]
-                        const s = q === "" ? 1 : score(e.name, q)
-                        if (s > 0) out.push({ s: s, i: i, name: e.ch + "  " + e.name, sub: "",
-                                              run: () => root.typeText(e.ch) })
-                    }
-                } else if (p.mode === "clip") {
-                    if (lastMode !== "clip") { clipItems = []; clip.running = true }
-                    for (let i = 0; i < clipItems.length; i++) {
-                        const c = clipItems[i]
-                        const s = q === "" ? 1 : score(c.text, q)
-                        if (s > 0) out.push({ s: s, i: i, name: c.text.replace(/\s+/g, " "), sub: "",
-                                              run: () => root.pasteClip(c.id) })
-                    }
-                }
+                const q = p.q.toLowerCase()
+                const out = p.mode === "apps" ? appResults(p, q)
+                          : p.mode === "emoji" ? emojiResults(q)
+                          : clipResults(q)
 
                 const byName = p.mode === "apps"
                 out.sort((a, b) => b.s - a.s || (byName ? a.name.localeCompare(b.name) : a.i - b.i))
@@ -276,7 +288,7 @@ Scope {
             Rectangle {
                 anchors.fill: parent
                 radius: 2
-                color: Qt.alpha(Colors.base, 1.0)
+                color: Colors.base
                 border.width: 1
                 border.color: Colors.surface1
 

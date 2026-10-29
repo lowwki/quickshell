@@ -35,6 +35,8 @@ Singleton {
 	return wired || wifi || devices[0] || null;
   }
   property string ipAddress: "0.0.0.0"
+  // Computed once here; the bar widgets all read this instead of calling getNetworkDetails()
+  readonly property var details: getNetworkDetails(defaultAdapter)
 
   function getConnectedNetworks(networksArr) {
 	let connectedNetworks = [];
@@ -75,14 +77,13 @@ Singleton {
 
 	let networksArr = adapter.networks.values;
 	let connectedNetworks = getConnectedNetworks(networksArr);
-	let deviceWifi = isDeviceWifi(adapter);
 
 	let primaryNetwork = connectedNetworks[0];
 	if (!primaryNetwork) {
 	  return {
 		"adapterName": adapter.name,
 		"adapterConnected": adapter.connected,
-		"adapterIsWifi": deviceWifi,
+		"adapterIsWifi": true,
 		"networkName": "No Network",
 		"networkStrength": 0,
 		"icon": "󰤭"
@@ -97,7 +98,7 @@ Singleton {
 	let outputDict = {
 	  "adapterName": adapter.name,
 	  "adapterConnected": adapter.connected,
-	  "adapterIsWifi": deviceWifi,
+	  "adapterIsWifi": true,
 	  "networkName": networkName,
 	  "networkStrength": networkStrength,
 	  "icon": networkIcon,
@@ -108,36 +109,24 @@ Singleton {
   }
 
   function getWifiIcon(strength) {
+	if (!(strength > 0))
+	  return "󰤭";
+
 	let iconArr = ["󰤟", "󰤢", "󰤥", "󰤨"];
 	let strengthIndex = Math.ceil(strength * iconArr.length);
-	return iconArr[strengthIndex - 1];
-  }
-
-  function getWifiText() {
-	let info = getNetworkDetails(defaultAdapter);
-
-	let adapter = info["adapterName"];
-	let name = info["networkName"];
-
-	let finalString = adapter + " - " + name;
-	return finalString;
-  }
-
-  function isConnectedAndWifi() {
-	return root.connectedWifi;
+	return iconArr[Math.min(strengthIndex, iconArr.length) - 1];
   }
 
   function isDeviceWifi(adapter) {
-	if (adapter.type == DeviceType.Wifi) {
-	  return true;
-	} else if (adapter.type == DeviceType.Wired) {
-	  return false;
-	} else {
-	  return false;
-	}
+	return adapter.type == DeviceType.Wifi;
   }
 
   function refreshIpAddress() {
+	if (!defaultAdapter) {
+	  ipAddress = "";
+	  return;
+	}
+
 	ipProcess.running = true;
   }
 
@@ -149,7 +138,7 @@ Singleton {
 	id: ipProcess
 
 	command: root.defaultAdapter ? ["sh", "-c", "ip -4 -o addr show dev " + root.defaultAdapter.name
-	  + " scope global | awk '{sub(\"/.*\", \"\", $4); printf $4}'"] : ["true"]
+	  + " scope global | awk '{sub(\"/.*\", \"\", $4); printf $4}'"] : []
 	running: false
 
 	stdout: StdioCollector {

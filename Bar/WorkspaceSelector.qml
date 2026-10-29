@@ -14,7 +14,8 @@ Container {
   required property var monitor
   property double rowLeftMargin: 5
   property double workspaceButtonSpacing: 4
-  property double workspaceCount: WorkspaceManager.getNumberOfWorkspaces(monitor)
+  readonly property var workspaces: WorkspaceManager.getWorkspacesForMonitor(monitor)
+  readonly property int workspaceCount: workspaces.length
   property double workspaceWidth: 17
 
   boxHeight: barHeight
@@ -43,7 +44,7 @@ Container {
 	Repeater {
 	  delegate: workspaceButton
 	  delegateModelAccess: DelegateModel.ReadOnly
-	  model: WorkspaceManager.getWorkspacesForMonitor(root.exclusiveMonitor)
+	  model: root.workspaces
 	}
 
 	Component {
@@ -53,7 +54,7 @@ Container {
 		id: buttonRoot
 
 		required property var modelData
-		property double stateInt: WorkspaceManager.getWorkspaceStateIndex(modelData)
+		readonly property int stateInt: WorkspaceManager.getWorkspaceStateIndex(modelData)
 		property variant workspaceColors: [Colors.lavender, Colors.overlay2, Colors.surface2]
 		readonly property var numerals: ["十", "九", "八", "七", "六", "五", "四", "三", "二", "一"]
         

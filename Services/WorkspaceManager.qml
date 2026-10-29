@@ -2,11 +2,9 @@ pragma Singleton
 import QtQuick
 import Quickshell
 
-
 Singleton {
   id: root
 
-  
   function _forOutput(outputName) {
     return NiriService.workspaces
       .filter(ws => ws.output === outputName)
@@ -19,11 +17,9 @@ Singleton {
   }
 
   function getWorkspacesForMonitor(monitor) {
-    return monitor ? _visibleForOutput(monitor.name) : [];
-  }
-
-  function getNumberOfWorkspaces(monitor) {
-    return getWorkspacesForMonitor(monitor).length;
+    if (!monitor)
+      return [];
+    return _visibleForOutput(monitor.name);
   }
 
   function getWorkspaceStateIndex(workspace) {
@@ -35,23 +31,11 @@ Singleton {
   }
 
   function activateWorkspace(workspace) {
+    if (!workspace)
+      return;
     Quickshell.execDetached(["sh", "-c",
       "niri msg action focus-monitor \"$1\" && niri msg action focus-workspace \"$2\"",
       "sh", workspace.output, String(workspace.idx)]);
-  }
-
-  
-  function activateWorkspaceById(id) {
-    const ws = NiriService.workspaces.find(w => w.id == id);
-    if (ws)
-      activateWorkspace(ws);
-  }
-
-  
-  function activateNextFreeWorkspace() {
-    const list = _forOutput(NiriService.focusedOutput);
-    if (list.length > 0)
-      Quickshell.execDetached(["niri", "msg", "action", "focus-workspace", String(list[list.length - 1].idx)]);
   }
 
   function focusNext() {

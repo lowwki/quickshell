@@ -186,17 +186,16 @@ Item {
 	id: hoverHandler
 
 	onHoveredChanged: {
-	  if (hoverHandler.hovered == true) {
-		root.hovered = true;
-	  } else {
-		root.hovered = false;
-		root.boxOpened = false;
-		if (root.state == "closed" || root.state == "tablet") {
-		  if (IpcManager.tabletMode == false) {
-			root.stack.replace(root.defaultItem);
-		  }
-		}
-	  }
+	  root.hovered = hoverHandler.hovered;
+	  if (hoverHandler.hovered)
+		return;
+
+	  root.boxOpened = false;
+	  if (IpcManager.tabletMode)
+		return;
+
+	  if (root.state == "closed" || root.state == "tablet")
+		root.stack.replace(root.defaultItem);
 	}
   }
 

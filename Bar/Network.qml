@@ -31,7 +31,7 @@ Container {
 	StyledText {
 	  horizontalAlignment: Qt.AlignCenter
 	  propo: true
-	  text: NetworkManager.getNetworkDetails(NetworkManager.defaultAdapter)["icon"] || "󰤭"
+	  text: NetworkManager.details["icon"] || "󰤭"
 	  verticalAlignment: Qt.AlignVCenter
 	}
   }
@@ -69,14 +69,14 @@ Container {
 			CenteredText {
 			  fontSize: 23
 			  propo: true
-			  text: NetworkManager.getNetworkDetails(NetworkManager.defaultAdapter)["icon"]
+			  text: NetworkManager.details["icon"]
 			}
 		  }
 
 		  Column {
 			id: networkColumn
 
-			property var networkInfo: NetworkManager.getNetworkDetails(NetworkManager.defaultAdapter)
+			property var networkInfo: NetworkManager.details
 
 			Layout.alignment: Qt.AlignVCenter
 			Layout.fillWidth: true

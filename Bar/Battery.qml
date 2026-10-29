@@ -40,7 +40,7 @@ Container {
 		  anchors.verticalCenter: parent.verticalCenter
 		  fontSize: 11
 		  horizontalAlignment: Text.AlignHCenter
-		  text: Math.round(BatteryManager.getBatteryPercentage(BatteryManager.mainBattery))  // + "%";
+		  text: Math.round(BatteryManager.percent)
  		  verticalAlignment: Text.AlignVCenter
 		}
 	  }
@@ -82,7 +82,7 @@ Container {
 			Rectangle {
 			  color: Colors.green
 			  implicitHeight: (root.batteryDisplayHeight - (batteryDisplayRoot.innerMargin * 2) - (
-								 batteryDisplayRoot.outerMargin * 2)) * BatteryManager.mainBattery.percentage
+								 batteryDisplayRoot.outerMargin * 2)) * (BatteryManager.percent / 100)
 			  radius: percentBox.percentBoxRadius
 
 			  anchors {
@@ -94,7 +94,7 @@ Container {
 
 			CenteredText {
 			  fontSize: 15
-			  text: BatteryManager.getBatteryPercentage(BatteryManager.mainBattery) + "%"
+			  text: BatteryManager.percent + "%"
 			}
 		  }
 

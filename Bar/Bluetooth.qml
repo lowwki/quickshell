@@ -17,8 +17,8 @@ Container {
   animOffset: 200
   boxColor: Colors.peach
   boxHeight: 20
-  boxHeightOpened: (root.devicePlaqueHeight * BluetoothManager.getConnectedDevicesList().length) + (
-					 root.devicePlaqueSpacing * (BluetoothManager.getConnectedDevicesList().length + 1)) + 2
+  boxHeightOpened: (root.devicePlaqueHeight * BluetoothManager.connectedDevices.length) + (
+					 root.devicePlaqueSpacing * (BluetoothManager.connectedDevices.length + 1)) + 2
   boxWidth: 25
   boxWidthOpened: 350
   defaultItem: icon
@@ -55,7 +55,7 @@ Container {
 
 	  Repeater {
 		delegate: devicePlaque
-		model: BluetoothManager.getConnectedDevicesList()
+		model: BluetoothManager.connectedDevices
 	  }
 
 	  Component {

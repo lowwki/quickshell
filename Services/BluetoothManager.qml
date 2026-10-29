@@ -7,28 +7,20 @@ Singleton {
   id: root
 
   property BluetoothAdapter defaultAdapter: Bluetooth.defaultAdapter || null
-  property string defaultAdapterName: defaultAdapter ? defaultAdapter.adapterId : ""
 
-  property bool anyConnected: root.defaultAdapter != null
-    && root.defaultAdapter.devices.values.some(device => device.connected)
+  // Connected devices of the default adapter, computed once and shared by every consumer
+  readonly property var connectedDevices: {
+    const connected = [];
+    if (!defaultAdapter)
+      return connected;
 
-  function getConnected() {
-	return root.anyConnected;
+    for (const device of defaultAdapter.devices.values) {
+      if (device.connected)
+        connected.push(device);
+    }
+    return connected;
   }
-
-  function getConnectedDevicesList() {
-	let devicesList = getDevicesList();
-	if (!devicesList) {
-	  return [];
-	}
-	let connectedList = [];
-	for (let device of devicesList) {
-	  if (device.connected == true) {
-		connectedList.push(device);
-	  }
-	}
-	return connectedList;
-  }
+  readonly property bool anyConnected: connectedDevices.length > 0
 
   function getDeviceText(device) {
 	if (!device) {
@@ -53,13 +45,6 @@ Singleton {
 	  "battery": deviceBattery,
 	  "batteryRaw": deviceBatteryRaw
 	};
-  }
-
-  function getDevicesList() {
-	if (!root.defaultAdapter) {
-	  return [];
-	}
-	return root.defaultAdapter.devices.values;
   }
 
   function getIcon(name) {

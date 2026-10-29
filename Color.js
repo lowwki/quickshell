@@ -1,3 +1,5 @@
+.pragma library
+
 // wanted to made monochrome. didnit bother to change color variables, too much work
 
 let rosewater = "#a8a8a8"; // was #f5e0dc

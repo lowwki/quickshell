@@ -15,7 +15,7 @@ Container {
   property double radius: 4
 
   animOffset: 150
-  boxColor: Colors.green
+  boxColor: Colors.gray8
   boxHeight: 20
   boxHeightOpened: root.batteryDisplayHeight
   boxRadius: radius
@@ -80,7 +80,7 @@ Container {
 			radius: 5
 
 			Rectangle {
-			  color: Colors.green
+			  color: Colors.gray8
 			  implicitHeight: (root.batteryDisplayHeight - (batteryDisplayRoot.innerMargin * 2) - (
 								 batteryDisplayRoot.outerMargin * 2)) * (BatteryManager.percent / 100)
 			  radius: percentBox.percentBoxRadius

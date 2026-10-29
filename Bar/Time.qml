@@ -22,7 +22,7 @@ Container {
   property double notificationWidth: 350
   property bool notified: false
 
-  boxColor: Colors.mauve
+  boxColor: Colors.gray5
   boxHeight: 20
   boxWidth: IpcManager.tabletMode ? 600 : 60
   defaultItem: IpcManager.tabletMode ? tabletTime : time
@@ -202,7 +202,7 @@ Container {
 
             StyledText {
               anchors.fill: parent
-              color: Colors.mauve
+              color: Colors.gray5
               fontSize: 14
               fontWeight: 10
               horizontalAlignment: Qt.AlignHCenter
@@ -214,7 +214,7 @@ Container {
         }
 
         CenteredText {
-          color: Colors.mauve
+          color: Colors.gray5
           text: TimeManager.time
         }
 
@@ -300,7 +300,7 @@ Container {
             Layout.margins: notificationRoot.innerMargin
             Layout.preferredHeight: notificationRoot.getInnerHeight()
             Layout.preferredWidth: notificationRoot.getInnerHeight()
-            color: Colors.mauve
+            color: Colors.gray5
             radius: 6
 
             // real picture: fill the whole square and crop to the rounded corners
@@ -526,7 +526,7 @@ Container {
               Rectangle {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                color: Colors.lavender
+                color: Colors.gray9
                 height: seekBar.trackHeight
                 radius: height / 2
                 width: Math.max(0, seekHandle.x - seekBar.gap)
@@ -536,7 +536,7 @@ Container {
                 id: seekHandle
 
                 anchors.verticalCenter: parent.verticalCenter
-                color: Colors.lavender
+                color: Colors.gray9
                 height: seekBar.height
                 radius: width / 2
                 width: 3
@@ -646,7 +646,7 @@ Container {
 
     StyledText {
       anchors.fill: parent
-      color: mediaHover.hovered ? Colors.lavender : Colors.text
+      color: mediaHover.hovered ? Colors.gray9 : Colors.text
       fontSize: 13
       horizontalAlignment: Qt.AlignHCenter
       propo: true

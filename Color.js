@@ -1,21 +1,23 @@
 .pragma library
 
-// wanted to made monochrome. didnit bother to change color variables, too much work
+// Monochrome palette ported from a Catppuccin Mocha config.
+// Accents are named by their actual shade: gray1 (darkest) to gray14 (lightest).
+// The "was" comments give the original Catppuccin name and hex.
 
-let rosewater = "#a8a8a8"; // was #f5e0dc
-let flamingo = "#a0a0a0"; // was #f2cdcd
-let pink = "#989898"; // was #f5c2e7
-let mauve = "#909090"; // was #cba6f7
-let red = "#b8b8b8"; // was #f38ba8
-let maroon = "#888888"; // was #eba0ac
-let peach = "#808080"; // was #fab387
-let yellow = "#acacac"; // was #f9e2af
-let green = "#9c9c9c"; // was #a6e3a1
-let teal = "#949494"; // was #94e2d5
-let sky = "#8c8c8c"; // was #89dceb
-let sapphire = "#848484"; // was #74c7ec
-let blue = "#a4a4a4"; // was #89b4fa
-let lavender = "#9e9e9e"; // was #b4befe
+let gray1 = "#808080"; // was peach #fab387
+let gray2 = "#848484"; // was sapphire #74c7ec
+let gray3 = "#888888"; // was maroon #eba0ac
+let gray4 = "#8c8c8c"; // was sky #89dceb
+let gray5 = "#909090"; // was mauve #cba6f7
+let gray6 = "#949494"; // was teal #94e2d5
+let gray7 = "#989898"; // was pink #f5c2e7
+let gray8 = "#9c9c9c"; // was green #a6e3a1
+let gray9 = "#9e9e9e"; // was lavender #b4befe
+let gray10 = "#a0a0a0"; // was flamingo #f2cdcd
+let gray11 = "#a4a4a4"; // was blue #89b4fa
+let gray12 = "#a8a8a8"; // was rosewater #f5e0dc
+let gray13 = "#acacac"; // was yellow #f9e2af
+let gray14 = "#b8b8b8"; // was red #f38ba8
 
 // Fonts: kept exactly as the original
 let text = "#cdd6f4"; // original, unchanged

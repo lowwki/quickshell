@@ -55,7 +55,7 @@ Container {
 
 		required property var modelData
 		readonly property int stateInt: WorkspaceManager.getWorkspaceStateIndex(modelData)
-		property variant workspaceColors: [Colors.lavender, Colors.overlay2, Colors.surface2]
+		property variant workspaceColors: [Colors.gray9, Colors.overlay2, Colors.surface2]
 		readonly property var numerals: ["十", "九", "八", "七", "六", "五", "四", "三", "二", "一"]
         
 		Layout.alignment: Qt.AlignLeft

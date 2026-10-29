@@ -8,7 +8,7 @@ Scope {
     id: root
     property bool open: false
     property string initial: ""
-    property color accent: Colors.red  
+    property color accent: Colors.gray14  
     readonly property string home: Quickshell.env("HOME")
     property string emojiFile: Quickshell.env("EMOJI_FILE") || (home + "/.local/share/emoji-test.txt")
     property var emojis: []

@@ -15,7 +15,7 @@ Container {
   required property var monitor
 
   animOffset: 200
-  boxColor: Colors.peach
+  boxColor: Colors.gray1
   boxHeight: 20
   boxHeightOpened: (root.devicePlaqueHeight * BluetoothManager.connectedDevices.length) + (
 					 root.devicePlaqueSpacing * (BluetoothManager.connectedDevices.length + 1)) + 2
@@ -104,7 +104,7 @@ Container {
 			  Rectangle {
 				id: batteryIndicator
 
-				color: Colors.green
+				color: Colors.gray8
 				implicitHeight: (deviceListRoot.plaqueHeight - (deviceInfoRow.margin * 2))
 								* devicePlaqueRoot.deviceText["batteryRaw"]
 				radius: iconContainer.boxRadius

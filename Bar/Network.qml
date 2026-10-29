@@ -14,7 +14,7 @@ Container {
   property double networkDisplayHeight: 80
 
   animOffset: 250
-  boxColor: Colors.red
+  boxColor: Colors.gray14
   boxHeight: 20
   boxHeightOpened: root.networkDisplayHeight
   boxWidth: 25
@@ -61,7 +61,7 @@ Container {
 
 			Layout.fillHeight: true
 			Layout.margins: networkDisplayRoot.innerMargin
-			color: Colors.red
+			color: Colors.gray14
 			implicitWidth: root.networkDisplayHeight - (networkDisplayRoot.innerMargin * 2) - (
 							 networkDisplayRoot.outerMargin * 2)
 			radius: 5

@@ -31,7 +31,7 @@ Container {
 	id: icon
 
 	Item {
-	  // Icon and percentage are separate items so the pair can be centered and aligned precisely
+	  // Icon and percentage are separate items to be centered and aligned precisely
 	  Row {
 		anchors.centerIn: parent
 		spacing: 4

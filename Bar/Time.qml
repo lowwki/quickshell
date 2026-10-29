@@ -261,9 +261,7 @@ Container {
       property double innerMargin: 5
       property double outerMargin: 2
 
-      // Real picture (screenshot, avatar, album art). It can arrive in `image`,
-      // or as a file path in `appIcon` (what notify-send -i <file> does).
-      // Empty when the notification only has a themed app icon.
+      // for showing icon or scrt preview
       readonly property string thumbSource: {
         let n = root.latestNotif;
         if (!n)
@@ -303,7 +301,7 @@ Container {
             color: Colors.gray5
             radius: 6
 
-            // real picture: fill the whole square and crop to the rounded corners
+            // real picture in  whole square and crop to rounded corner
             Image {
               anchors.fill: parent
               asynchronous: true
@@ -312,7 +310,7 @@ Container {
               visible: notificationRoot.thumbSource != ""
             }
 
-            // themed app icon: keep a small margin around it
+            // themed app icon, small margin around it
             IconImage {
               anchors.fill: parent
               anchors.margins: 8
@@ -362,7 +360,6 @@ Container {
       property double artSize: root.mprisHeight - ((innerMargin + outerMargin) * 2)
       property real dragProgress: 0
       property bool dragging: false
-      // Some players (Firefox) don't report a real track length; then there is nothing to seek within
       readonly property bool hasLength: player != null && player.lengthSupported && player.length > player.position + 0.5
       property double innerMargin: 5
       readonly property real length: hasLength ? player.length : 0
@@ -371,7 +368,6 @@ Container {
       readonly property real position: player ? Math.max(0, player.position) : 0
       readonly property real progress: length > 0 ? Math.min(1, position / length) : 0
       readonly property bool seekable: hasLength && player.positionSupported && player.canSeek
-      // false while the box is still growing; see the seek handle's Behavior below
       property bool settled: false
       readonly property real shownProgress: dragging ? dragProgress : progress
 
@@ -388,7 +384,6 @@ Container {
         return m + ":" + ss;
       }
 
-      // The player position is not pushed automatically, so poll it while playing
       Timer {
         interval: 500
         repeat: true
@@ -398,7 +393,6 @@ Container {
         onTriggered: mprisToastRoot.player.positionChanged()
       }
 
-      // After a seek, wait a moment, refresh the position, then hand the handle back
       Timer {
         id: settleTimer
 
@@ -457,7 +451,7 @@ Container {
             Layout.fillWidth: true
             spacing: 1
 
-            // Title + artist on the left, transport controls on the right
+            // Title + artist on the left, controls on the right
             RowLayout {
               Layout.fillWidth: true
               spacing: 4
@@ -513,7 +507,7 @@ Container {
               }
             }
 
-            // Android style slider: rounded track, gap, thin handle
+            // Android style slider
             Item {
               id: seekBar
 
@@ -542,9 +536,6 @@ Container {
                 width: 3
                 x: Math.min(seekBar.width - width, Math.max(0, (seekBar.width * mprisToastRoot.shownProgress) - (width / 2)))
 
-                // Glide only once the box has settled. While it grows, the slider width changes
-                // every frame, and a 450ms glide made the handle (and the filled track) keep
-                // moving for a while after the box had already stopped.
                 Behavior on x {
                   enabled: !mprisToastRoot.dragging && mprisToastRoot.settled
 

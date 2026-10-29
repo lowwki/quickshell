@@ -12,7 +12,6 @@ Container {
 
   property double batteryDisplayHeight: 100
   required property var monitor
-  property bool opened: false
   property double radius: 4
 
   animOffset: 150
@@ -32,21 +31,10 @@ Container {
 	id: icon
 
 	Item {
-	  property string component: "icon"
-
 	  // Icon and percentage are separate items so the pair can be centered and aligned precisely
 	  Row {
 		anchors.centerIn: parent
 		spacing: 4
-
-		// StyledText {
-		//   anchors.verticalCenter: parent.verticalCenter
-		//   fontSize: 10
-		//   horizontalAlignment: Text.AlignHCenter
-		//   propo: true
-		//   text: BatteryManager.getBatteryIcon(BatteryManager.mainBattery) || ""
-		//   verticalAlignment: Text.AlignVCenter
-		// }
 
 		StyledText {
 		  anchors.verticalCenter: parent.verticalCenter
@@ -133,8 +121,6 @@ Container {
 			}
 
 			StyledText {
-			  property var timeInfo: batColumn.batInfo["time"]
-
 			  color: Colors.subtext1
 			  fontSize: 12
 			  fontWeight: 5

@@ -55,7 +55,6 @@ Container {
 		required property var modelData
 		property double stateInt: WorkspaceManager.getWorkspaceStateIndex(modelData)
 		property variant workspaceColors: [Colors.lavender, Colors.overlay2, Colors.surface2]
-		property string workspaceId: modelData.id
 		readonly property var numerals: ["十", "九", "八", "七", "六", "五", "四", "三", "二", "一"]
         
 		Layout.alignment: Qt.AlignLeft
@@ -78,19 +77,16 @@ Container {
 		}
 
 		TapHandler {
-		  id: tapHandler
-
 		  onTapped: WorkspaceManager.activateWorkspace(buttonRoot.modelData)
 		}
 
 		Rectangle {
 		  anchors.fill: parent
 		  color: buttonRoot.workspaceColors[buttonRoot.stateInt]
-		  radius: 0
 
           CenteredText {
                 yOffset: -0.8
-      			text: buttonRoot.numerals[buttonRoot.modelData.idx] ?? buttonRoot.modelData.idx     // 	text: buttonRoot.modelData.idx
+          text: buttonRoot.numerals[buttonRoot.modelData.idx] ?? buttonRoot.modelData.idx
 		  }
 		}
 	  }

@@ -11,14 +11,9 @@ Text {
   color: Colors.base
   elide: Text.ElideRight
 
-font {
-	family: root.propo == true ? "GeistMono Nerd Font Propo" : "GeistMono Nerd Font"
-	pointSize: fontSize
-	weight: root.fontWeight * 100
+  font {
+    family: root.propo ? "GeistMono Nerd Font Propo" : "GeistMono Nerd Font"
+    pointSize: root.fontSize
+    weight: root.fontWeight * 100
   }
-	//  font {
-	// family: root.propo == true ? "FiraMono Nerd Font Propo" : "FiraMono Nerd Font"
-	// pointSize: fontSize
-	// weight: root.fontWeight * 100
-	//  }
 }

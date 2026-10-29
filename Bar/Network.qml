@@ -59,8 +59,6 @@ Container {
 		  Rectangle {
 			id: iconBox
 
-			property double iconBoxRadius: 5
-
 			Layout.fillHeight: true
 			Layout.margins: networkDisplayRoot.innerMargin
 			color: Colors.red
@@ -98,8 +96,6 @@ Container {
 			}
 
 			StyledText {
-			  property var timeInfo: networkColumn.networkInfo["time"]
-
 			  color: Colors.subtext1
 			  fontSize: 12
 			  fontWeight: 5

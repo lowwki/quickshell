@@ -1,9 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Io
 import Quickshell.Services.Notifications
 import Quickshell.Widgets
 
@@ -15,10 +13,6 @@ Container {
   id: root
 
   property Notification latestNotif
-  property bool logout: false
-  property double logoutHeight: 100
-  property double logoutMargin: 7
-  property double logoutSpacing: 5
   required property var monitor
   property bool mpris: false
   property double mprisHeight: 76
@@ -71,24 +65,6 @@ Container {
         }
       }
     }
-    // State {
-    //   name: "logout"
-    //   when: root.logout == true
-    //
-    //   PropertyChanges {
-    //     root.boxHeight: root.logoutHeight
-    //     root.boxRadius: 13
-    //     root.boxWidth: ((root.logoutHeight - (root.logoutMargin * 2)) * 5) + (root.logoutMargin * 2) + (
-    //                      root.logoutSpacing * 4)
-    //     root.visibleTopMargin: 10
-    //   }
-    //
-    //   StateChangeScript {
-    //     script: {
-    //       root.stack.replace(logoutMenu);
-    //     }
-    //   }
-    // }
   ]
 
   // Closes the mpris toast (never touches an active notification)
@@ -107,7 +83,7 @@ Container {
   // Toast shows only while hovering AND something is playing
   onHoveredChanged: {
     if (root.hovered == true) {
-      if (root.logout == false && root.notified == false && MprisManager.getPlaying() == true) {
+      if (root.notified == false && MprisManager.getPlaying() == true) {
         root.overriden = true;
         root.mpris = true;
       }
@@ -120,7 +96,7 @@ Container {
   onMprisPlayingChanged: {
     if (root.mprisPlaying == false) {
       root.closeMpris();
-    } else if (root.hovered == true && root.logout == false && root.notified == false) {
+    } else if (root.hovered == true && root.notified == false) {
       root.overriden = true;
       root.mpris = true;
     }
@@ -151,149 +127,10 @@ Container {
     }
   }
 
-  // Component {
-  //   id: logoutMenu
-  //
-  //   Item {
-  //     id: logoutMenuRoot
-  //
-  //     property var logoutModel: [
-  //       {
-  //         color: Colors.red,
-  //         text: "\uf011",
-  //         key: Qt.Key_S,
-  //         command: ["systemctl", "poweroff"]
-  //       },
-  //       {
-  //         color: Colors.peach,
-  //         text: "󰗽",
-  //         key: Qt.Key_E,
-  //         command: ["niri", "msg", "action", "quit", "--skip-confirmation"]
-  //       },
-  //       {
-  //         color: Colors.yellow,
-  //         text: "󰑓",
-  //         key: Qt.Key_R,
-  //         command: ["systemctl", "reboot"]
-  //       },
-  //       {
-  //         color: Colors.green,
-  //         text: "󰌾",
-  //         key: Qt.Key_L,
-  //         command: ["hyprlock"]
-  //       },
-  //       {
-  //         color: Colors.sky,
-  //         text: "󰤄",
-  //         key: Qt.Key_U,
-  //         command: ["systemctl", "suspend"]
-  //       },
-  //     ]
-  //
-  //     Component.onCompleted: {
-  //       forceActiveFocus();
-  //     }
-  //
-  //     Keys.onPressed: event => {
-  //       if (event.key == Qt.Key_Escape) {
-  //         IpcManager.closeLogoutMenu();
-  //       } else {
-  //         for (let button of logoutMenuRoot.logoutModel) {
-  //           if (button.key == event.key) {
-  //             IpcManager.closeLogoutMenu();
-  //             event.accepted = true;
-  //             Quickshell.execDetached(button.command);
-  //           }
-  //         }
-  //       }
-  //     }
-  //
-  //     RowLayout {
-  //       spacing: root.logoutSpacing
-  //
-  //       anchors {
-  //         fill: parent
-  //         margins: root.logoutMargin
-  //       }
-  //
-  //       Repeater {
-  //         delegate: logoutButton
-  //         model: logoutMenuRoot.logoutModel
-  //       }
-  //
-  //       Component {
-  //         id: logoutButton
-  //
-  //         Item {
-  //           id: logoutButtonRoot
-  //
-  //           required property var modelData
-  //
-  //           Layout.fillHeight: true
-  //           Layout.fillWidth: true
-  //
-  //           HoverHandler {
-  //             id: logoutHoverHandler
-  //
-  //             onHoveredChanged: {
-  //               if (logoutHoverHandler.hovered == true) {
-  //                 buttonBackground.color = Colors.surface1;
-  //                 logoutButtonText.color = logoutButtonRoot.modelData.color;
-  //               } else {
-  //                 buttonBackground.color = logoutButtonRoot.modelData.color;
-  //                 logoutButtonText.color = Colors.base;
-  //               }
-  //             }
-  //           }
-  //
-  //           TapHandler {
-  //             onTapped: {
-  //               Quickshell.execDetached(logoutButtonRoot.modelData.command);
-  //             }
-  //           }
-  //
-  //           Rectangle {
-  //             id: buttonBackground
-  //
-  //             anchors.fill: parent
-  //             color: logoutButtonRoot.modelData.color
-  //             radius: 7
-  //
-  //             Behavior on color {
-  //               ColorAnimation {
-  //                 duration: 100
-  //               }
-  //             }
-  //
-  //             StyledText {
-  //               id: logoutButtonText
-  //
-  //               anchors.fill: parent
-  //               fontSize: 25
-  //               horizontalAlignment: Qt.AlignHCenter
-  //               propo: true
-  //               text: logoutButtonRoot.modelData.text
-  //               verticalAlignment: Qt.AlignVCenter
-  //
-  //               Behavior on color {
-  //                 ColorAnimation {
-  //                   duration: 100
-  //                 }
-  //               }
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
-
   Component {
     id: time
 
     StyledText {
-      property string component: "time"
-
       horizontalAlignment: Qt.AlignCenter
       text: TimeManager.time
       verticalAlignment: Qt.AlignVCenter
@@ -304,8 +141,6 @@ Container {
     id: tabletTime
 
     Item {
-      property string component: "tabletTime"
-
       Rectangle {
         color: Colors.surface1
         radius: root.boxRadius - 2
@@ -370,29 +205,6 @@ Container {
               verticalAlignment: Qt.AlignVCenter
             }
           }
-        }
-
-        Row {
-          anchors {
-            bottom: parent.bottom
-            bottomMargin: 3
-            left: parent.left
-            leftMargin: 4
-            top: parent.top
-            topMargin: 3
-          }
-
-          // Repeater {
-          //   delegate: tabletButton
-          //   model: [
-          //     {
-          //       text: "󱗿",
-          //       onTapped: function () {
-          //         IpcManager.toggleLauncher();
-          //       }
-          //     },
-          //   ]
-          // }
         }
 
         CenteredText {
@@ -542,7 +354,6 @@ Container {
       id: mprisToastRoot
 
       property double artSize: root.mprisHeight - ((innerMargin + outerMargin) * 2)
-      property bool debug: true
       property real dragProgress: 0
       property bool dragging: false
       // Some players (Firefox) don't report a real track length; then there is nothing to seek within
@@ -601,20 +412,6 @@ Container {
         running: true
 
         onTriggered: mprisToastRoot.settled = true
-      }
-
-      // TEMPORARY: set debug to false once the timeline behaves
-      Timer {
-        interval: 1000
-        repeat: true
-        running: mprisToastRoot.debug && mprisToastRoot.player != null
-
-        onTriggered: console.log("mpris-debug:", mprisToastRoot.player.identity,
-                                 "length=" + mprisToastRoot.player.length,
-                                 "position=" + mprisToastRoot.player.position,
-                                 "lengthSupported=" + mprisToastRoot.player.lengthSupported,
-                                 "positionSupported=" + mprisToastRoot.player.positionSupported,
-                                 "canSeek=" + mprisToastRoot.player.canSeek)
       }
 
       Rectangle {

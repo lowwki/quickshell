@@ -1,7 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Effects
-import Quickshell
 
 import "../Color.js" as Colors
 import "../Services/"
@@ -21,34 +19,24 @@ Item {
   property double boxWidth: 100
   property double boxWidthOpened: 200
   readonly property double calculatedTopMargin: {
-	if (!root.exclusiveToScreen) {
-	  return visibleTopMargin;
-	}
+    if (!root.exclusiveToScreen)
+      return visibleTopMargin;
 
-	if (NiriService.isFocused(root.exclusiveMonitor)) {
-	  if (!root.forceHidden) {
-		return visibleTopMargin;
-	  } else if (root.hoverableWhenHidden) {
-		return 7 - root.boxHeight - 5;
-	  }
-	}
+    if (!root.forceHidden && NiriService.isFocused(root.exclusiveMonitor))
+      return visibleTopMargin;
 
-	return -4 - root.boxHeight - 5;
+    return -4 - root.boxHeight - 5;
   }
   property Component defaultItem
   required property var exclusiveMonitor
   property bool exclusiveToScreen: false
   property bool forceHidden: false
-  property alias hover: hoverHandler
-  property bool hoverableWhenHidden: false
   property bool hovered: false
   property Component openedItem
   property bool overriden: false
   property int popDuration: 185                                           // shared by width, height and radius
   property real popOvershoot: 0.8
-  property alias rect: container
   property alias stack: containerContent
-  property alias tap: tapHandler
   property double visibleTopMargin: 0
 
   implicitHeight: boxHeight
@@ -96,8 +84,7 @@ Item {
 	},
 	State {
 	  name: "tablet"
-	  when: ( root.hovered == false || IpcManager.tabletMode == true ) && root.boxOpened == false && root.overriden == false
-			&& IpcManager.tabletMode == true
+	  when: root.boxOpened == false && root.overriden == false && IpcManager.tabletMode == true
 
 	  PropertyChanges {
 		container.radius: root.boxRadius
@@ -207,7 +194,6 @@ Item {
 		if (root.state == "closed" || root.state == "tablet") {
 		  if (IpcManager.tabletMode == false) {
 			root.stack.replace(root.defaultItem);
-			console.log("some");
 		  }
 		}
 	  }

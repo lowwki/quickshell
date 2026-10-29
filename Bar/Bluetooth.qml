@@ -30,21 +30,11 @@ Container {
   Component {
 	id: icon
 	StyledText {
-	  property string component: "icon"
-
 	  horizontalAlignment: Qt.AlignCenter
 	  propo: true
 	  text: "󰂱"
 	  verticalAlignment: Qt.AlignVCenter
 	}
-	// StyledText {
-	//   property string component: "icon"
-	//
-	//   horizontalAlignment: Qt.AlignCenter
-	//   propo: true
-	//   text: "󰂱"
-	//   verticalAlignment: Qt.AlignVCenter
-	// }
   }
 
   Component {
@@ -53,7 +43,6 @@ Container {
 	Column {
 	  id: deviceListRoot
 
-	  property string component: "deviceList"
 	  property double plaqueHeight: root.devicePlaqueHeight
 	  property double plaqueSpacing: root.devicePlaqueSpacing
 

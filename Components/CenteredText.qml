@@ -1,5 +1,4 @@
 import QtQuick
-import "../Color.js" as Colors
 
 StyledText {
   property real yOffset: 0
